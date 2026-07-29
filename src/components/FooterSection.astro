@@ -1,0 +1,80 @@
+---
+import { translations } from '../i18n/translations';
+const defaultLang = 'es';
+const t = translations[defaultLang].footer;
+---
+
+<footer
+  class="relative px-6 py-10 md:py-20 border-t border-gold-500/25 bg-forest-800 text-center overflow-hidden"
+>
+  <div class="max-w-4xl mx-auto flex flex-col items-center gap-6 relative z-10">
+    <!-- Icono central Qorsu -->
+    <div class="group relative inline-block w-25 h-25" aria-label="Qorsu Top">
+      <img
+        src="/logo.png"
+        alt="Qorsu Top"
+        class="w-full h-full object-contain"
+      />
+    </div>
+
+    <!-- Enlaces Sociales -->
+    <nav
+      id="footer-links"
+      class="flex flex-wrap items-center justify-center gap-8 font-sans text-xs tracking-[0.25em] uppercase"
+    >
+      {t.socialLinks.map((link, i) => (
+        <a
+          href={link.href}
+          class="footer-link text-gold-500 hover:text-gold-300 transition-colors duration-300 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-gold-300 hover:after:w-full after:transition-all after:duration-300"
+          data-link-idx={i}
+        >
+          {link.label}
+        </a>
+      ))}
+    </nav>
+
+    <!-- Línea divisoria sutil -->
+    <div class="w-24 h-px bg-gold-500/20 my-1"></div>
+
+    <!-- Copyright (i18n) -->
+    <div
+      id="footer-copyright"
+      class="font-sans text-xs tracking-[0.25em] uppercase text-sage-500 select-none transition-opacity duration-300"
+    >
+      {t.copyright}
+    </div>
+  </div>
+</footer>
+
+<script>
+  import { translations, type Language } from '../i18n/translations';
+
+  function updateFooterLang(lang: Language) {
+    const t = translations[lang].footer;
+    const copyrightEl = document.getElementById('footer-copyright');
+    if (copyrightEl) {
+      copyrightEl.textContent = t.copyright;
+    }
+
+    const links = document.querySelectorAll<HTMLAnchorElement>('.footer-link');
+    links.forEach((linkEl) => {
+      const idxStr = linkEl.getAttribute('data-link-idx');
+      if (idxStr === null) return;
+      const idx = parseInt(idxStr, 10);
+      const linkData = t.socialLinks[idx];
+      if (linkData) {
+        linkEl.textContent = linkData.label;
+        linkEl.href = linkData.href;
+      }
+    });
+  }
+
+  window.addEventListener('qorsu:lang-change', ((e: CustomEvent<{ lang: Language }>) => {
+    updateFooterLang(e.detail.lang);
+  }) as EventListener);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const lang = (localStorage.getItem('qorsu_lang') as Language) || 'es';
+    updateFooterLang(lang);
+  });
+</script>

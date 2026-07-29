@@ -1,0 +1,89 @@
+---
+import Logo from './Logo.astro';
+---
+
+<header
+  class="fixed top-0 z-50 w-full transition-all duration-300 backdrop-blur-md bg-forest-800 border-b border-gold-500/10"
+>
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-3 py-3 sm:py-5 md:px-12">
+    <Logo size="responsive" />
+
+    <div
+      class="flex items-center gap-1 p-1 rounded-full border border-gold-500/20 bg-forest-900/60 shadow-inner"
+      role="group"
+      aria-label="Language Switcher"
+    >
+      <button
+        type="button"
+        id="lang-btn-es"
+        data-lang="es"
+        class="lang-toggle-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-sans text-xs tracking-[0.2em] transition-all duration-300 cursor-pointer bg-gold-500/20 text-gold-300 border border-gold-500/30 shadow-[0_0_12px_rgba(201,162,75,0.25)]"
+      >
+        ES
+      </button>
+      <button
+        type="button"
+        id="lang-btn-en"
+        data-lang="en"
+        class="lang-toggle-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-sans text-xs tracking-[0.2em] transition-all duration-300 cursor-pointer text-sage-500 border border-transparent hover:text-sage-300"
+      >
+        EN
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  function updateLangUI(lang: 'es' | 'en') {
+    const btnEs = document.getElementById('lang-btn-es');
+    const btnEn = document.getElementById('lang-btn-en');
+    if (!btnEs || !btnEn) return;
+
+    const activeClass = [
+      'bg-gold-500/20',
+      'text-gold-300',
+      'border',
+      'border-gold-500/30',
+      'shadow-[0_0_12px_rgba(201,162,75,0.25)]',
+    ];
+    const idleClass = ['text-sage-500', 'border', 'border-transparent', 'hover:text-sage-300'];
+
+    if (lang === 'es') {
+      btnEs.classList.remove(...idleClass);
+      btnEs.classList.add(...activeClass);
+      btnEn.classList.remove(...activeClass);
+      btnEn.classList.add(...idleClass);
+    } else {
+      btnEn.classList.remove(...idleClass);
+      btnEn.classList.add(...activeClass);
+      btnEs.classList.remove(...activeClass);
+      btnEs.classList.add(...idleClass);
+    }
+  }
+
+  function setupNavbar() {
+    const btns = document.querySelectorAll<HTMLButtonElement>('.lang-toggle-btn');
+    const currentLang = (localStorage.getItem('qorsu_lang') as 'es' | 'en') || 'es';
+    updateLangUI(currentLang);
+
+    btns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const selectedLang = btn.getAttribute('data-lang') as 'es' | 'en';
+        if (!selectedLang) return;
+        localStorage.setItem('qorsu_lang', selectedLang);
+        updateLangUI(selectedLang);
+        window.dispatchEvent(
+          new CustomEvent('qorsu:lang-change', { detail: { lang: selectedLang } })
+        );
+      });
+    });
+  }
+
+  // Ejecutar al cargar la página y en transiciones de vista de Astro
+  document.addEventListener('DOMContentLoaded', setupNavbar);
+  document.addEventListener('astro:page-load', setupNavbar);
+
+  window.addEventListener('qorsu:lang-change', ((e: CustomEvent<{ lang: 'es' | 'en' }>) => {
+    updateLangUI(e.detail.lang);
+  }) as EventListener);
+</script>

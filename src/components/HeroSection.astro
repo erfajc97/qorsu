@@ -1,0 +1,106 @@
+---
+import { translations } from "../i18n/translations";
+const defaultLang = "es";
+const t = translations[defaultLang].hero;
+---
+
+<section
+  class="relative h-screen flex flex-col items-center justify-center px-6 py-20 overflow-hidden text-center"
+>
+  <!-- Iluminación de fondo de lujo -->
+  <div
+    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(235,213,160,0.18)_0%,rgba(201,162,75,0.08)_40%,transparent_70%)] blur-3xl animate-pulse"
+    style="animation-duration: 8s;"
+  >
+  </div>
+
+  <!-- Partícula ambiental sutil -->
+  <div
+    class="absolute top-30 sm:top-1/4 right-1/4 w-32 h-32 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(201,162,75,0.15)_0%,transparent_70%)] animate-float-slow"
+  >
+  </div>
+  <div
+    class="absolute bottom-0 sm:bottom-1/4 left-1/4 w-40 h-40 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(235,213,160,0.12)_0%,transparent_70%)] animate-float-slow"
+    style="animation-delay: -3s;"
+  >
+  </div>
+
+  <div
+    class="relative z-10 flex flex-col items-center gap-10 w-full max-w-4xl mx-auto"
+  >
+    <!-- Titular QORSU con estrella SVG original integrada -->
+    <h1
+      class="relative flex items-center justify-center font-sans text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-[0.32em] uppercase select-none gold-gradient-text translate-x-3"
+    >
+      <span>Q</span>
+      <span class="relative inline-block w-26 sm:w-50 h-26 sm:h-50 mt-2">
+        <img
+          src="/logo.png"
+          alt="QORSU Logo"
+          class="w-full h-full object-contain -translate-x-1 sm:-translate-x-3"
+        />
+      </span>
+      <span>RSU</span>
+    </h1>
+
+    <div
+      class="flex flex-col items-center gap-5 w-full max-w-[250px] sm:max-w-2xl"
+    >
+      <!-- Subtítulo principal (inglés por defecto en ambas versiones según el original) -->
+      <p
+        id="hero-subtitle"
+        class="font-serif text-2xl sm:text-3xl md:text-4xl italic text-sage-200 tracking-wide font-light leading-relaxed"
+      >
+        {t.subtitle}
+      </p>
+
+      <!-- Divisor dorado sutil -->
+      <div
+        class="w-16 h-px bg-gradient-to-r from-transparent via-gold-500 to-transparent my-1"
+      >
+      </div>
+
+      <!-- Categorías (i18n) -->
+      <div
+        id="hero-categories"
+        class="font-sans text-xs sm:text-sm tracking-[0.28em] uppercase text-gold-500 transition-opacity duration-300"
+      >
+        {t.categories}
+      </div>
+
+      <!-- Fecha y Lugar (i18n) -->
+      <div
+        id="hero-date-location"
+        class="font-sans text-xs tracking-[0.3em] uppercase text-sage-500 transition-opacity duration-300"
+      >
+        {t.dateLocation}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { translations, type Language } from "../i18n/translations";
+
+  function updateHeroLang(lang: Language) {
+    const t = translations[lang].hero;
+    const catEl = document.getElementById("hero-categories");
+    const dateEl = document.getElementById("hero-date-location");
+    const subtitleEl = document.getElementById("hero-subtitle");
+
+    if (catEl) catEl.textContent = t.categories;
+    if (dateEl) dateEl.textContent = t.dateLocation;
+    if (subtitleEl) subtitleEl.textContent = t.subtitle;
+  }
+
+  window.addEventListener("qorsu:lang-change", ((
+    e: CustomEvent<{ lang: Language }>,
+  ) => {
+    updateHeroLang(e.detail.lang);
+  }) as EventListener);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const lang = (localStorage.getItem("qorsu_lang") as Language) || "es";
+    updateHeroLang(lang);
+  });
+</script>

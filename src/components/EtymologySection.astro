@@ -1,0 +1,152 @@
+---
+import { translations } from '../i18n/translations';
+const defaultLang = 'es';
+const t = translations[defaultLang].etymology;
+---
+
+<section
+  class="relative px-6 py-16 md:py-32 border-t border-gold-500/25 bg-forest-700 overflow-hidden"
+>
+  <!-- Aura dorada en la esquina superior derecha -->
+  <div
+    class="absolute -top-36 -right-28 w-[480px] h-[480px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(235,213,160,0.22)_0%,rgba(201,162,75,0.1)_38%,transparent_70%)] blur-2xl"
+  ></div>
+
+  <div
+    class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center relative z-10"
+  >
+    <!-- Columna Izquierda: Identidad y significado de marca -->
+    <div class="lg:col-span-5 flex flex-col gap-3 sm:gap-5 text-left">
+      <div class="flex flex-col gap-1">
+        <h2
+          id="etym-word"
+          class="font-sans text-6xl sm:text-7xl md:text-8xl tracking-wider leading-none gold-gradient-text select-none"
+        >
+          {t.nameWord}
+        </h2>
+        <span
+          id="etym-pronunciation"
+          class="font-sans text-lg sm:text-xl text-sage-500 tracking-widest"
+        >
+          {t.pronunciation}
+        </span>
+      </div>
+
+      <div class="text-2xl sm:text-3xl font-serif italic text-gold-300">
+        <span id="etym-golden-sun">{t.goldenSun}</span>
+      </div>
+
+      <div class="w-14 h-px bg-gold-500 my-1"></div>
+
+      <p
+        id="etym-energy-line"
+        class="font-serif text-lg sm:text-xl leading-relaxed text-sage-400 max-w-md transition-opacity duration-300"
+      >
+        {t.energyLine}
+      </p>
+    </div>
+
+    <!-- Línea divisoria vertical en escritorio, horizontal en móvil -->
+    <div class="hidden lg:block lg:col-span-1 flex justify-center self-stretch">
+      <div
+        class="w-px h-full bg-gradient-to-b from-transparent via-gold-500/50 to-transparent"
+      ></div>
+    </div>
+    <div
+      class="block lg:hidden w-full h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent my-2"
+    ></div>
+
+    <!-- Columna Derecha: Tarjetas interactivas Qori + Sué -->
+    <div class="lg:col-span-6 flex items-center justify-center">
+      <div class="grid grid-cols-1 sm:grid-cols-11 items-center gap-4 sm:gap-6 w-full">
+        <!-- Tarjeta QORI -->
+        <div
+          class="sm:col-span-5 group glass-card p-6 sm:p-8 rounded-2xl border border-gold-500/20 transition-all duration-500 hover:border-gold-400 hover:shadow-[0_10px_35px_rgba(201,162,75,0.2)] hover:-translate-y-1.5 flex flex-col items-center sm:items-start text-center sm:text-left gap-3"
+        >
+          <span
+            class="font-sans text-4xl sm:text-5xl tracking-widest uppercase gold-gradient-text animate-word-glow"
+          >
+            {t.qoriTitle}
+          </span>
+          <span
+            id="etym-qori-meaning"
+            class="font-serif text-2xl text-sage-200 group-hover:text-gold-300 transition-colors"
+          >
+            {t.qoriMeaning}
+          </span>
+          <span
+            id="etym-qori-origin"
+            class="font-sans text-xs tracking-[0.24em] uppercase text-sage-500"
+          >
+            {t.qoriOrigin}
+          </span>
+        </div>
+
+        <!-- Símbolo Más animado -->
+        <div
+          class="sm:col-span-1 flex justify-center items-center font-sans text-3xl sm:text-4xl text-gold-500 animate-plus-pulse select-none my-2 sm:my-0"
+        >
+          +
+        </div>
+
+        <!-- Tarjeta SUÉ -->
+        <div
+          class="sm:col-span-5 group glass-card p-6 sm:p-8 rounded-2xl border border-gold-500/20 transition-all duration-500 hover:border-gold-400 hover:shadow-[0_10px_35px_rgba(201,162,75,0.2)] hover:-translate-y-1.5 flex flex-col items-center sm:items-start text-center sm:text-left gap-3"
+        >
+          <span
+            class="font-sans text-4xl sm:text-5xl tracking-widest uppercase gold-gradient-text animate-word-glow"
+            style="animation-delay: 2.5s;"
+          >
+            {t.sueTitle}
+          </span>
+          <span
+            id="etym-sue-meaning"
+            class="font-serif text-2xl text-sage-200 group-hover:text-gold-300 transition-colors"
+          >
+            {t.sueMeaning}
+          </span>
+          <span
+            id="etym-sue-origin"
+            class="font-sans text-xs tracking-[0.24em] uppercase text-sage-500"
+          >
+            {t.sueOrigin}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { translations, type Language } from '../i18n/translations';
+
+  function updateEtymLang(lang: Language) {
+    const t = translations[lang].etymology;
+    const wordEl = document.getElementById('etym-word');
+    const pronEl = document.getElementById('etym-pronunciation');
+    const goldenEl = document.getElementById('etym-golden-sun');
+    const energyEl = document.getElementById('etym-energy-line');
+    const qoriMeaningEl = document.getElementById('etym-qori-meaning');
+    const qoriOriginEl = document.getElementById('etym-qori-origin');
+    const sueMeaningEl = document.getElementById('etym-sue-meaning');
+    const sueOriginEl = document.getElementById('etym-sue-origin');
+
+    if (wordEl) wordEl.textContent = t.nameWord;
+    if (pronEl) pronEl.textContent = t.pronunciation;
+    if (goldenEl) goldenEl.textContent = t.goldenSun;
+    if (energyEl) energyEl.textContent = t.energyLine;
+    if (qoriMeaningEl) qoriMeaningEl.textContent = t.qoriMeaning;
+    if (qoriOriginEl) qoriOriginEl.textContent = t.qoriOrigin;
+    if (sueMeaningEl) sueMeaningEl.textContent = t.sueMeaning;
+    if (sueOriginEl) sueOriginEl.textContent = t.sueOrigin;
+  }
+
+  window.addEventListener('qorsu:lang-change', ((e: CustomEvent<{ lang: Language }>) => {
+    updateEtymLang(e.detail.lang);
+  }) as EventListener);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const lang = (localStorage.getItem('qorsu_lang') as Language) || 'es';
+    updateEtymLang(lang);
+  });
+</script>

@@ -1,0 +1,37 @@
+---
+interface Props {
+  className?: string;
+  showText?: boolean;
+  size?: 'sm' | 'md' | 'lg' | 'responsive';
+}
+
+const { className = '', showText = true, size = 'responsive' } = Astro.props;
+
+const iconSizes = {
+  sm: 'w-7 h-7',
+  md: 'w-8 h-8',
+  lg: 'w-8 h-8 sm:w-9 sm:h-9',
+  responsive: 'w-8 h-8 sm:w-9 sm:h-9',
+};
+
+const textSizes = {
+  sm: 'text-xs',
+  md: 'text-sm',
+  lg: 'text-sm sm:text-xl',
+  responsive: 'text-sm sm:text-xl',
+};
+---
+
+<div
+  class={`group inline-flex items-center gap-2.5 font-sans tracking-[0.3em] uppercase text-gold-500 ${className}`}
+  aria-label="Qorsu Home"
+>
+  <span class={`relative inline-block ${iconSizes[size]} transition-transform duration-500 ease-out group-hover:rotate-12 group-hover:scale-110`}>
+    <img
+      src="/logo.png"
+      alt="QORSU"
+      class="w-full h-full object-contain"
+    />
+  </span>
+  {showText && <span class={`${textSizes[size]} font-normal select-none`}>QORSU</span>}
+</div>
