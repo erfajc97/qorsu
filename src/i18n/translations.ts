@@ -91,11 +91,11 @@ export const translations: Record<Language, Translations> = {
     ],
     footer: {
       socialLinks: [
-        { label: 'Instagram', href: '#' },
-        { label: 'LinkedIn', href: '#' },
+        { label: 'Instagram', href: 'https://www.instagram.com/qorsu_?igsh=cWNqdmhyMmVrcDh1' },
+        { label: 'LinkedIn', href: 'https://www.linkedin.com/company/qorsu/' },
         { label: 'Contacto', href: 'mailto:hola@qorsu.com' },
       ],
-      copyright: 'Una vertical de Shepwashi · 2026',
+      copyright: 'Una vertical de',
     },
   },
   en: {

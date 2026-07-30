@@ -1,6 +1,6 @@
 ---
-import { translations } from '../i18n/translations';
-const defaultLang = 'es';
+import { translations } from "../i18n/translations";
+const defaultLang = "es";
 const t = translations[defaultLang].footer;
 ---
 
@@ -22,15 +22,19 @@ const t = translations[defaultLang].footer;
       id="footer-links"
       class="flex flex-wrap items-center justify-center gap-8 font-sans text-xs tracking-[0.25em] uppercase"
     >
-      {t.socialLinks.map((link, i) => (
-        <a
-          href={link.href}
-          class="footer-link text-gold-500 hover:text-gold-300 transition-colors duration-300 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-gold-300 hover:after:w-full after:transition-all after:duration-300"
-          data-link-idx={i}
-        >
-          {link.label}
-        </a>
-      ))}
+      {
+        t.socialLinks.map((link, i) => (
+          <a
+            href={link.href}
+            class="footer-link text-gold-500 hover:text-gold-300 transition-colors duration-300 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-gold-300 hover:after:w-full after:transition-all after:duration-300"
+            data-link-idx={i}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {link.label}
+          </a>
+        ))
+      }
     </nav>
 
     <!-- Línea divisoria sutil -->
@@ -38,27 +42,40 @@ const t = translations[defaultLang].footer;
 
     <!-- Copyright (i18n) -->
     <div
-      id="footer-copyright"
-      class="font-sans text-xs tracking-[0.25em] uppercase text-sage-500 select-none transition-opacity duration-300"
+      class="flex items-center gap-2 uppercase font-sans text-xs tracking-[0.25em]"
     >
-      {t.copyright}
+      <div
+        id="footer-copyright"
+        class="uppercase text-sage-500 select-none transition-opacity duration-300"
+      >
+        {t.copyright}
+      </div>
+      <a
+        href={"https://shepwashi.com/"}
+        class="footer-link text-gold-500 hover:text-gold-300 transition-colors duration-300 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-gold-300 hover:after:w-full after:transition-all after:duration-300"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Shepwashi
+      </a>
+      · 2026
     </div>
   </div>
 </footer>
 
 <script>
-  import { translations, type Language } from '../i18n/translations';
+  import { translations, type Language } from "../i18n/translations";
 
   function updateFooterLang(lang: Language) {
     const t = translations[lang].footer;
-    const copyrightEl = document.getElementById('footer-copyright');
+    const copyrightEl = document.getElementById("footer-copyright");
     if (copyrightEl) {
       copyrightEl.textContent = t.copyright;
     }
 
-    const links = document.querySelectorAll<HTMLAnchorElement>('.footer-link');
+    const links = document.querySelectorAll<HTMLAnchorElement>(".footer-link");
     links.forEach((linkEl) => {
-      const idxStr = linkEl.getAttribute('data-link-idx');
+      const idxStr = linkEl.getAttribute("data-link-idx");
       if (idxStr === null) return;
       const idx = parseInt(idxStr, 10);
       const linkData = t.socialLinks[idx];
@@ -69,12 +86,14 @@ const t = translations[defaultLang].footer;
     });
   }
 
-  window.addEventListener('qorsu:lang-change', ((e: CustomEvent<{ lang: Language }>) => {
+  window.addEventListener("qorsu:lang-change", ((
+    e: CustomEvent<{ lang: Language }>,
+  ) => {
     updateFooterLang(e.detail.lang);
   }) as EventListener);
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const lang = (localStorage.getItem('qorsu_lang') as Language) || 'es';
+  document.addEventListener("DOMContentLoaded", () => {
+    const lang = (localStorage.getItem("qorsu_lang") as Language) || "es";
     updateFooterLang(lang);
   });
 </script>
