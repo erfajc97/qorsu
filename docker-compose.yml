@@ -1,0 +1,8 @@
+services:
+  qorsu-landing:
+    build: .
+    image: landing-qorsu-web
+    container_name: landing-qorsu-web
+    ports:
+      - "3050:80"
+    restart: unless-stopped
