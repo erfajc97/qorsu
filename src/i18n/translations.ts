@@ -51,7 +51,7 @@ export const translations: Record<Language, Translations> = {
     },
     hero: {
       subtitle: 'Más allá del agente IA, al servicio de todos.',
-      categories: 'Lujo · Turismo · Hospitalidad',
+      categories: 'Lujo · Turismo · Hospitalidad · Ciudades del futuro',
       dateLocation: 'Septiembre 2026 · Qarybe Summit, Cartagena',
     },
     etymology: {
@@ -106,7 +106,7 @@ export const translations: Record<Language, Translations> = {
     },
     hero: {
       subtitle: 'Beyond agentic AI, at the service of all.',
-      categories: 'Luxury · Tourism · Hospitality',
+      categories: 'Luxury · Tourism · Hospitality · Future cities',
       dateLocation: 'September 2026 · Qarybe Summit, Cartagena',
     },
     etymology: {
