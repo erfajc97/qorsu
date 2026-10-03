@@ -1,106 +1,202 @@
 ---
-import { translations } from "../i18n/translations";
-const defaultLang = "es";
-const t = translations[defaultLang].hero;
+import { translations } from '../i18n/translations';
+import GoldDust from './GoldDust.astro';
+const t = translations.es;
 ---
 
-<section
-  class="relative h-screen flex flex-col items-center justify-center px-6 py-20 overflow-hidden text-center"
->
-  <!-- Iluminación de fondo de lujo -->
-  <div
-    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(235,213,160,0.18)_0%,rgba(201,162,75,0.08)_40%,transparent_70%)] blur-3xl animate-pulse"
-    style="animation-duration: 8s;"
-  >
+<!--
+  Layered hero. The art is cut at the horizon into two real planes:
+    sky  (sun, rings, far hills)   sinks slowly
+    type (wordmark + lines)        sinks faster, between the planes
+    sea  (water, boat; alpha above the horizon) stays put, in front
+  so on scroll the wordmark and the sun set together behind the bay.
+  Gold dust drifts in front of everything as the atmospheric plane.
+-->
+<section id="top" class="hero relative h-svh min-h-[560px] overflow-hidden bg-deep-950" data-hero>
+  <div class="hero-plane" data-hero-sky>
+    <picture>
+      <source media="(max-width: 767px)" srcset="/art/hero-sky-m.webp" />
+      <img src="/art/hero-sky.webp" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
+    </picture>
   </div>
 
-  <!-- Partícula ambiental sutil -->
-  <div
-    class="absolute top-30 sm:top-1/4 right-1/4 w-32 h-32 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(201,162,75,0.15)_0%,transparent_70%)] animate-float-slow"
-  >
-  </div>
-  <div
-    class="absolute bottom-0 sm:bottom-1/4 left-1/4 w-40 h-40 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(235,213,160,0.12)_0%,transparent_70%)] animate-float-slow"
-    style="animation-delay: -3s;"
-  >
-  </div>
-
-  <div
-    class="relative z-10 flex flex-col items-center gap-10 w-full max-w-4xl mx-auto"
-  >
-    <!-- Titular QORSU con estrella SVG original integrada -->
-    <h1
-      class="relative flex items-center justify-center font-sans text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-[0.32em] uppercase select-none gold-gradient-text translate-x-3"
-    >
-      <span>Q</span>
-      <span class="relative inline-block w-26 sm:w-50 h-26 sm:h-50 mt-2">
-        <img
-          src="/logo.png"
-          alt="QORSU Logo"
-          class="w-full h-full object-contain -translate-x-1 sm:-translate-x-3"
-        />
+  <div class="hero-copy" data-hero-copy>
+    <h1 class="hero-mark" aria-label="QORSU">
+      <span class="hero-letter" style="--d:80ms">Q</span>
+      <span class="hero-letter hero-o" style="--d:200ms" aria-hidden="true">
+        <img src="/logo.png" alt="" class="hero-o__sun" />
       </span>
-      <span>RSU</span>
+      <span class="hero-letter" style="--d:320ms">R</span>
+      <span class="hero-letter" style="--d:440ms">S</span>
+      <span class="hero-letter" style="--d:560ms">U</span>
     </h1>
 
-    <div
-      class="flex flex-col items-center gap-5 w-full max-w-[250px] sm:max-w-2xl"
-    >
-      <!-- Subtítulo principal (inglés por defecto en ambas versiones según el original) -->
-      <p
-        id="hero-subtitle"
-        class="font-serif text-2xl sm:text-3xl md:text-4xl italic text-sage-200 tracking-wide font-light leading-relaxed"
-      >
-        {t.subtitle}
-      </p>
-
-      <!-- Divisor dorado sutil -->
-      <div
-        class="w-16 h-px bg-gradient-to-r from-transparent via-gold-500 to-transparent my-1"
-      >
-      </div>
-
-      <!-- Categorías (i18n) -->
-      <div
-        id="hero-categories"
-        class="font-sans text-xs sm:text-sm tracking-[0.28em] uppercase text-gold-500 transition-opacity duration-300"
-      >
-        {t.categories}
-      </div>
-
-      <!-- Fecha y Lugar (i18n) -->
-      <div
-        id="hero-date-location"
-        class="font-sans text-xs tracking-[0.3em] uppercase text-sage-500 transition-opacity duration-300"
-      >
-        {t.dateLocation}
-      </div>
-    </div>
+    <p data-i18n="hero.categories" class="hero-cats hero-fade" style="--d:900ms">{t.hero.categories}</p>
   </div>
+
+  <div class="hero-plane" data-hero-sea>
+    <picture>
+      <source media="(max-width: 767px)" srcset="/art/hero-sea-m.webp" />
+      <img src="/art/hero-sea.webp" alt="" aria-hidden="true" decoding="async" />
+    </picture>
+  </div>
+
+  <GoldDust />
+
+  <!-- Caption on the water: rides with the page, stays in front of the sea -->
+  <div class="hero-caption hero-fade" style="--d:1300ms">
+    <span class="block h-px w-10 bg-gold-400/70" aria-hidden="true"></span>
+    <p data-i18n="hero.summit" class="eyebrow text-mist-300">{t.hero.summit}</p>
+  </div>
+
+  <!-- Hand-off into the bay below -->
+  <div class="pointer-events-none absolute inset-x-0 bottom-0 z-[6] h-[12%] bg-gradient-to-b from-transparent to-deep-950"></div>
 </section>
 
-<script>
-  import { translations, type Language } from "../i18n/translations";
-
-  function updateHeroLang(lang: Language) {
-    const t = translations[lang].hero;
-    const catEl = document.getElementById("hero-categories");
-    const dateEl = document.getElementById("hero-date-location");
-    const subtitleEl = document.getElementById("hero-subtitle");
-
-    if (catEl) catEl.textContent = t.categories;
-    if (dateEl) dateEl.textContent = t.dateLocation;
-    if (subtitleEl) subtitleEl.textContent = t.subtitle;
+<style>
+  .hero-plane {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+    transform: scale(1.06);
+  }
+  .hero-plane :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 62%;
+    display: block;
+  }
+  [data-hero-sky] {
+    z-index: 1;
+  }
+  .hero-copy {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1.5rem, 3.5vh, 2.5rem);
+    padding: 5rem var(--gutter) 30vh;
+    text-align: center;
+    will-change: transform, opacity;
+  }
+  [data-hero-sea] {
+    z-index: 3;
   }
 
-  window.addEventListener("qorsu:lang-change", ((
-    e: CustomEvent<{ lang: Language }>,
-  ) => {
-    updateHeroLang(e.detail.lang);
-  }) as EventListener);
+  .hero-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: clamp(3.6rem, 16.5vw, 10.5rem);
+    line-height: 1;
+    letter-spacing: 0.12em;
+    margin-right: -0.12em; /* optical centring: trailing tracking */
+    color: var(--color-gold-400);
+    text-shadow: 0 0.04em 0.12em rgba(3, 39, 36, 0.55);
+    user-select: none;
+  }
+  .hero-o {
+    position: relative;
+    width: 1.1em;
+    height: 1.1em;
+    margin: 0 0.08em 0 -0.04em; /* the ring's own padding reads as space */
+  }
+  .hero-o__sun {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .hero-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(1.75rem, 6vh, 3.5rem);
+    z-index: 7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 var(--gutter);
+    text-align: center;
+  }
+  .hero-caption p {
+    margin: 0;
+    line-height: 1.9;
+    text-shadow: 0 1px 2px rgba(3, 39, 36, 0.9), 0 0 18px rgba(3, 39, 36, 0.85);
+  }
+  .hero-cats {
+    font-family: var(--font-sans);
+    font-size: clamp(0.6875rem, 1.1vw, 0.875rem);
+    letter-spacing: 0.26em;
+    line-height: 2;
+    text-transform: uppercase;
+    color: var(--color-mist-200);
+    max-width: 52rem;
+    text-shadow: 0 1px 12px rgba(3, 39, 36, 0.7);
+  }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const lang = (localStorage.getItem("qorsu_lang") as Language) || "es";
-    updateHeroLang(lang);
-  });
+  @media (max-width: 767px) {
+    .hero-plane :global(img) {
+      object-position: 42% 50%;
+    }
+    .hero-copy {
+      padding-bottom: 34vh;
+    }
+    .hero-caption p {
+      max-width: 18rem;
+    }
+    .hero-cats {
+      letter-spacing: 0.2em;
+      max-width: 20rem;
+    }
+  }
+</style>
+
+<script>
+  import { onFrame, onMeasure, finePointer, reduceMotion, clamp, put } from '../scripts/motion';
+
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  const sky = document.querySelector<HTMLElement>('[data-hero-sky]');
+  const sea = document.querySelector<HTMLElement>('[data-hero-sea]');
+  const copy = document.querySelector<HTMLElement>('[data-hero-copy]');
+
+  if (hero && sky && sea && copy && !reduceMotion) {
+    let h = hero.offsetHeight;
+    onMeasure(() => (h = hero.offsetHeight));
+
+    // Pointer gives the planes a hair of independent sway (desktop only).
+    const ptr = { x: 0, y: 0, cx: 0, cy: 0 };
+    if (finePointer) {
+      window.addEventListener(
+        'pointermove',
+        (e) => {
+          ptr.x = e.clientX / window.innerWidth - 0.5;
+          ptr.y = e.clientY / window.innerHeight - 0.5;
+        },
+        { passive: true }
+      );
+    }
+
+    onFrame(({ y, dt }) => {
+      if (y > h * 1.1) return; // off screen: nothing to do
+      const k = 1 - Math.exp(-4 * dt);
+      ptr.cx += (ptr.x - ptr.cx) * k;
+      ptr.cy += (ptr.y - ptr.cy) * k;
+      const s = clamp(y, 0, h);
+      const p = s / h;
+
+      put(sky, 'transform', `translate3d(${(ptr.cx * -10).toFixed(2)}px, ${(s * 0.42 + ptr.cy * -6).toFixed(2)}px, 0) scale(1.06)`);
+      put(sea, 'transform', `translate3d(${(ptr.cx * 16).toFixed(2)}px, ${(ptr.cy * 4).toFixed(2)}px, 0) scale(1.06)`);
+      put(copy, 'transform', `translate3d(${(ptr.cx * -4).toFixed(2)}px, ${(s * 0.7).toFixed(2)}px, 0)`);
+      put(copy, 'opacity', String(1 - clamp((p - 0.42) / 0.3)));
+    });
+  }
 </script>

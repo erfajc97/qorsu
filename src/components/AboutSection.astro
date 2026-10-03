@@ -1,0 +1,169 @@
+---
+import { translations } from '../i18n/translations';
+const t = translations.es;
+---
+
+<!--
+  The argument. Editorial split: the heading holds on the left while the
+  reasoning scrolls on the right. The "every store, every guest" line lights
+  word by word at reading pace.
+-->
+<section id="qorsu" class="about relative" aria-labelledby="about-title">
+  <div class="about-grid gutter">
+    <div class="about-aside">
+      <div class="about-sticky">
+        <img src="/logo.png" alt="" aria-hidden="true" class="about-sun" />
+        <h2 id="about-title" data-i18n="about.title" class="about-title reveal">{t.about.title}</h2>
+      </div>
+    </div>
+
+    <div class="about-body">
+      <p data-i18n="about.lead" class="about-lead reveal">{t.about.lead}</p>
+      <p data-i18n="about.p1" class="about-p reveal">{t.about.p1}</p>
+      <p data-i18n="about.p2" class="about-litany" data-litany>{t.about.p2}</p>
+      <p data-i18n="about.p3" class="about-p reveal">{t.about.p3}</p>
+      <p data-i18n="about.p4" class="about-coda reveal">{t.about.p4}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    padding: var(--section) 0;
+    background:
+      radial-gradient(60% 50% at 18% 20%, rgba(201, 162, 75, 0.1), transparent 70%),
+      var(--color-deep-950);
+  }
+  .about-grid {
+    max-width: 80rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2.5rem, 6vw, 7rem);
+  }
+  .about-sticky {
+    position: sticky;
+    top: 22vh;
+  }
+  .about-sun {
+    width: 2.75rem;
+    height: 2.75rem;
+    object-fit: contain;
+    margin-bottom: 2rem;
+  }
+  .about-title {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(2.75rem, 6vw, 5.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.015em;
+    color: var(--color-gold-200);
+    margin: 0;
+  }
+  .about-body {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2rem, 4vw, 3rem);
+    padding-top: 0.5rem;
+  }
+  .about-lead {
+    font-family: var(--font-serif);
+    font-size: clamp(1.75rem, 3vw, 2.6rem);
+    line-height: 1.22;
+    color: var(--color-mist-200);
+    margin: 0 0 1rem;
+    max-width: 22ch;
+  }
+  .about-p {
+    font-family: var(--font-sans);
+    font-size: clamp(0.95rem, 1.1vw, 1.0625rem);
+    line-height: 1.85;
+    letter-spacing: 0.01em;
+    color: var(--color-mist-400);
+    max-width: 58ch;
+    margin: 0;
+  }
+  .about-litany {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1.75rem, 3.4vw, 3rem);
+    line-height: 1.18;
+    color: var(--color-gold-300);
+    margin: clamp(1rem, 3vw, 2.5rem) 0;
+    padding-left: clamp(1rem, 2.5vw, 2rem);
+    border-left: 1px solid var(--hairline);
+    max-width: 22ch;
+  }
+  .about-litany :global(.w) {
+    opacity: var(--o, 0.18);
+    transition: opacity 0.4s linear;
+  }
+  .about-coda {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(2.25rem, 4.6vw, 4rem);
+    line-height: 1;
+    color: var(--color-gold-400);
+    margin: clamp(1rem, 3vw, 2rem) 0 0;
+  }
+
+  @media (max-width: 860px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+    .about-sticky {
+      position: static;
+    }
+    .about-sun {
+      margin-bottom: 1.25rem;
+    }
+  }
+</style>
+
+<script>
+  import { onFrame, onMeasure, reduceMotion, clamp, docTop } from '../scripts/motion';
+
+  const lit = document.querySelector<HTMLElement>('[data-litany]');
+
+  if (lit) {
+    let words: HTMLElement[] = [];
+    let top = 0;
+    let h = 1;
+    let last = -1;
+
+    const split = () => {
+      const text = lit.textContent ?? '';
+      lit.setAttribute('aria-label', text);
+      lit.innerHTML = text
+        .split(/(\s+)/)
+        .map((w) => (w.trim() ? `<span class="w" aria-hidden="true">${w}</span>` : w))
+        .join('');
+      words = Array.from(lit.querySelectorAll<HTMLElement>('.w'));
+      last = -1;
+      if (reduceMotion) words.forEach((w) => w.style.setProperty('--o', '1'));
+    };
+    split();
+    // The i18n script rewrites textContent on a language switch: re-split after it.
+    window.addEventListener('qorsu:lang-change', () => setTimeout(split, 0));
+
+    if (!reduceMotion) {
+      onMeasure(() => {
+        top = docTop(lit);
+        h = lit.offsetHeight;
+      });
+      onFrame(({ y, vh }) => {
+        // Lights from when the line's top crosses 85% of the screen until its
+        // bottom crosses 45%.
+        const start = top - vh * 0.85;
+        const end = top + h - vh * 0.45;
+        if (y < start - vh || y > end + vh) return;
+        const q = clamp((y - start) / (end - start));
+        const n = Math.round(q * words.length * 10) / 10;
+        if (n === last) return;
+        last = n;
+        words.forEach((w, i) => w.style.setProperty('--o', String(0.18 + 0.82 * clamp(n - i))));
+      });
+    }
+  }
+</script>

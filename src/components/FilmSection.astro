@@ -1,0 +1,209 @@
+---
+import { translations } from '../i18n/translations';
+const t = translations.es;
+---
+
+<!--
+  The hush. The dawn footage owns the whole screen. It plays at its own speed
+  (no scroll-scrubbing: seeking a web encode is what made the old version
+  stutter); scroll only eases the camera in and carries the two captions.
+-->
+<section id="film" class="film relative" data-film aria-labelledby="film-title">
+  <div class="film-stage" data-film-stage>
+    <div class="film-window" data-film-window>
+      <video
+        data-film-video
+        class="film-video"
+        poster="/video/qorsu-film-poster.jpg"
+        muted
+        loop
+        playsinline
+        preload="none"
+        disablepictureinpicture
+        aria-hidden="true"
+      >
+        <source data-src="/video/qorsu-film.mp4" type="video/mp4" />
+      </video>
+      <div class="film-veil" aria-hidden="true"></div>
+    </div>
+
+    <div class="film-progress" aria-hidden="true"><span data-film-progress></span></div>
+
+    <div class="film-copy film-copy--intro" data-film-intro>
+      <h2 id="film-title" data-i18n="film.title" class="film-title">{t.film.title}</h2>
+    </div>
+    <div class="film-copy film-copy--outro" data-film-outro>
+      <p data-i18n="film.outro" class="film-outro">{t.film.outro}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .film {
+    height: 240svh;
+  }
+  .film-stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+    background: var(--color-deep-950);
+  }
+  .film-window {
+    position: absolute;
+    inset: 0;
+  }
+  .film-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(var(--zoom, 1.12));
+    will-change: transform;
+  }
+  .film-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(3, 39, 36, 0.6) 0%, transparent 22%, transparent 70%, rgba(3, 39, 36, 0.7) 100%);
+  }
+  .film-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 2;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .film-progress span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-gold-500), var(--color-gold-300));
+    transform-origin: left;
+    transform: scaleX(0);
+    will-change: transform;
+  }
+  .film-copy {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    padding: clamp(6rem, 14vh, 8rem) var(--gutter);
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+  .film-copy--intro {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .film-copy--outro {
+    align-items: flex-end;
+    justify-content: flex-end;
+    text-align: right;
+    opacity: 0;
+  }
+  .film-title {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(2.25rem, 5.6vw, 5rem);
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+    color: var(--color-gold-200);
+    max-width: 16ch;
+    margin: 0;
+    text-shadow: 0 2px 30px rgba(3, 39, 36, 0.65);
+  }
+  .film-outro {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(2rem, 4.4vw, 4rem);
+    line-height: 1.05;
+    color: var(--color-gold-300);
+    text-shadow: 0 2px 24px rgba(3, 39, 36, 0.7);
+    margin: 0;
+  }
+
+  @media (max-width: 767px) {
+    .film {
+      height: 210svh;
+    }
+    .film-copy--outro {
+      justify-content: center;
+      text-align: center;
+    }
+  }
+
+  .film.is-static {
+    height: auto;
+  }
+  .film.is-static .film-stage {
+    position: relative;
+  }
+  .film.is-static .film-video {
+    transform: none;
+  }
+  .film.is-static .film-copy--outro {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  import { onFrame, onMeasure, reduceMotion, clamp, range, docTop, put } from '../scripts/motion';
+
+  const film = document.querySelector<HTMLElement>('[data-film]');
+  const stage = document.querySelector<HTMLElement>('[data-film-stage]');
+  const bar = document.querySelector<HTMLElement>('[data-film-progress]');
+  const video = document.querySelector<HTMLVideoElement>('[data-film-video]');
+  const intro = document.querySelector<HTMLElement>('[data-film-intro]');
+  const outro = document.querySelector<HTMLElement>('[data-film-outro]');
+
+  if (film && stage && video) {
+    // Load the clip only as the section approaches; play only while visible.
+    let loaded = false;
+    const load = () => {
+      if (loaded) return;
+      loaded = true;
+      const src = video.querySelector<HTMLSourceElement>('source[data-src]');
+      if (src) src.src = src.dataset.src!;
+      video.preload = 'auto';
+      video.load();
+    };
+    new IntersectionObserver(
+      (es) => es[0]?.isIntersecting && load(),
+      { rootMargin: '150% 0px' }
+    ).observe(film);
+    new IntersectionObserver((es) => {
+      const on = es[0]?.isIntersecting;
+      if (on && !reduceMotion) video.play().catch(() => {});
+      else video.pause();
+    }).observe(stage);
+
+    if (reduceMotion) {
+      film.classList.add('is-static');
+    } else {
+      let top = 0;
+      let travel = 1;
+      onMeasure(() => {
+        top = docTop(film);
+        travel = Math.max(film.offsetHeight - stage.offsetHeight, 1);
+      });
+
+      onFrame(({ y, vh }) => {
+        if (y < top - vh || y > top + travel + vh) return;
+        const p = clamp((y - top) / travel);
+        put(video, '--zoom', (1.12 - 0.12 * range(p, 0, 1)).toFixed(4));
+        put(bar, 'transform', `scaleX(${p.toFixed(4)})`);
+
+        const iOut = range(p, 0.3, 0.45);
+        put(intro, 'opacity', (1 - iOut).toFixed(3));
+        put(intro, 'transform', `translate3d(0,${(-iOut * 30).toFixed(1)}px,0)`);
+        const oIn = range(p, 0.66, 0.82);
+        put(outro, 'opacity', oIn.toFixed(3));
+        put(outro, 'transform', `translate3d(0,${((1 - oIn) * 30).toFixed(1)}px,0)`);
+      });
+    }
+  }
+</script>

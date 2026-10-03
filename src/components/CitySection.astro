@@ -1,0 +1,381 @@
+---
+import { translations } from '../i18n/translations';
+const t = translations.es;
+const sectors = t.city.sectors.split(' · ');
+
+// One light per sector, placed on the skyline of the panorama (percent of the
+// rail). Sorted left to right so the city switches on in the direction the
+// camera travels.
+const lights = [
+  [74.5, 70], [77, 62], [79, 72], [81.2, 57], [82.5, 88], [83.5, 67], [85, 60],
+  [86.3, 37], [88.5, 72], [88.8, 21], [90.5, 50], [92.5, 58], [95, 82], [97.5, 65],
+];
+// The rail is exactly 3:1, so a 300x100 viewBox scales uniformly (no stretched stroke).
+const path = 'M' + lights.map(([x, y]) => `${x * 3} ${y}`).join(' L');
+---
+
+<!--
+  The peak. A pinned horizontal crossing of the bay: open water, the sun,
+  then the city. As the skyline enters, each sector lights a window of the
+  city and its name in the list; at the end one gold line runs through all
+  of them. One infrastructure.
+-->
+<section id="ciudad" class="bay relative" data-bay aria-labelledby="bay-title">
+  <div class="bay-stage" data-bay-stage>
+    <div class="bay-rail" data-bay-rail>
+      <img
+        class="bay-art"
+        src="/art/bay-panorama.webp"
+        srcset="/art/bay-panorama-sm.webp 1536w, /art/bay-panorama.webp 3072w"
+        sizes="300vh"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="bay-glow" data-bay-glow aria-hidden="true"></div>
+      <svg class="bay-line" viewBox="0 0 300 100" aria-hidden="true">
+        <path d={path} pathLength="1" data-bay-line></path>
+      </svg>
+      {lights.map(([x, y], i) => (
+        <span class="bay-light" style={`left:${x}%;top:${y}%`} data-bay-light={i} aria-hidden="true"></span>
+      ))}
+    </div>
+
+    <div class="bay-scrim" aria-hidden="true"></div>
+
+    <div class="bay-copy">
+      <div class="bay-head">
+        <h2 id="bay-title" data-i18n="city.title" class="bay-title" data-bay-title>{t.city.title}</h2>
+        <p data-i18n="city.closing" class="bay-closing" data-bay-closing>{t.city.closing}</p>
+      </div>
+
+      <ul class="bay-sectors" data-bay-sectors aria-label={t.city.title}>
+        {sectors.map((s, i) => <li data-bay-sector={i}>{s}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bay {
+    height: 320svh;
+  }
+  .bay-stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+    background: var(--color-deep-950);
+  }
+  .bay-rail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    aspect-ratio: 3 / 1;
+    will-change: transform;
+  }
+  .bay-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .bay-glow {
+    position: absolute;
+    left: 66%;
+    top: 18%;
+    width: 36%;
+    height: 72%;
+    background: radial-gradient(closest-side, rgba(255, 214, 120, 0.42), rgba(227, 200, 120, 0.12) 55%, transparent 100%);
+    opacity: 0;
+    will-change: opacity;
+  }
+  .bay-line {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .bay-line path {
+    fill: none;
+    stroke: var(--color-gold-300);
+    stroke-width: 0.14;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    opacity: 0.85;
+  }
+  .bay-light {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    border-radius: 50%;
+    background: #fff4d1;
+    box-shadow: 0 0 0 4px rgba(255, 228, 160, 0.18), 0 2px 14px 4px rgba(255, 210, 110, 0.55);
+    opacity: 0;
+    transform: scale(0.3);
+    transition:
+      opacity 0.6s var(--ease-out-expo),
+      transform 0.9s var(--ease-out-expo);
+  }
+  .bay-light.is-on {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Scrim only where the copy sits: the left third on desktop */
+  .bay-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(to bottom, var(--color-deep-950) 0%, transparent 7%),
+      linear-gradient(to right, rgba(3, 39, 36, 0.82) 0%, rgba(3, 39, 36, 0.45) 30%, transparent 52%);
+  }
+
+  .bay-copy {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding: clamp(6rem, 16vh, 9rem) var(--gutter) clamp(2.5rem, 8vh, 5rem);
+    max-width: min(46rem, 50vw);
+    pointer-events: none;
+  }
+  .bay-head {
+    position: relative;
+  }
+  .bay-title,
+  .bay-closing {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    will-change: transform, opacity;
+  }
+  .bay-title {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(2.5rem, 5.2vw, 4.75rem);
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    color: var(--color-gold-200);
+    max-width: 12ch;
+  }
+  .bay-closing {
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+    line-height: 1.32;
+    color: var(--color-mist-200);
+    max-width: 24ch;
+    opacity: 0;
+  }
+
+  .bay-sectors {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    column-gap: 2.5rem;
+    row-gap: 0.7rem;
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+  .bay-sectors li {
+    position: relative;
+    padding-left: 1.1rem;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(198, 217, 205, 0.42);
+    transition: color 0.6s var(--ease-out-expo);
+  }
+  .bay-sectors li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    margin-top: -2.5px;
+    border-radius: 50%;
+    background: rgba(198, 217, 205, 0.35);
+    transition: background-color 0.6s, box-shadow 0.6s;
+  }
+  .bay-sectors li.is-on {
+    color: var(--color-gold-200);
+  }
+  .bay-sectors li.is-on::before {
+    background: #fff1c8;
+    box-shadow: 0 0 10px 2px rgba(255, 210, 110, 0.6);
+  }
+
+  @media (max-width: 767px) {
+    .bay {
+      height: 360svh;
+    }
+    .bay-scrim {
+      background:
+        linear-gradient(to bottom, var(--color-deep-950) 0%, rgba(3, 39, 36, 0.7) 22%, transparent 42%),
+        linear-gradient(to top, rgba(3, 39, 36, 0.92) 0%, rgba(3, 39, 36, 0.6) 26%, transparent 44%);
+    }
+    .bay-copy {
+      max-width: none;
+      padding-top: 5.5rem;
+      padding-bottom: 2rem;
+    }
+    .bay-title {
+      font-size: clamp(2.25rem, 10vw, 3rem);
+    }
+    .bay-closing {
+      font-size: 1.3rem;
+      max-width: 26ch;
+    }
+    .bay-sectors {
+      column-gap: 1.25rem;
+      row-gap: 0.55rem;
+    }
+    .bay-sectors li {
+      font-size: 0.625rem;
+      letter-spacing: 0.12em;
+      padding-left: 0.9rem;
+    }
+  }
+
+  /* Reduced motion: no pin, the finished city, everything readable */
+  .bay.is-static {
+    height: auto;
+  }
+  .bay.is-static .bay-stage {
+    position: relative;
+    height: auto;
+    min-height: 100svh;
+  }
+  .bay.is-static .bay-copy {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2.5rem;
+  }
+  .bay.is-static .bay-rail {
+    left: auto;
+    right: 0;
+  }
+  .bay.is-static .bay-title,
+  .bay.is-static .bay-closing {
+    position: relative;
+    opacity: 1;
+  }
+  .bay.is-static .bay-closing {
+    margin-top: 1.5rem;
+  }
+  .bay.is-static .bay-sectors,
+  .bay.is-static .bay-glow {
+    opacity: 1;
+  }
+  .bay.is-static .bay-line path {
+    stroke-dashoffset: 0;
+  }
+</style>
+
+<script>
+  import { onFrame, onMeasure, reduceMotion, clamp, range, docTop, put } from '../scripts/motion';
+  import { translations, type Language } from '../i18n/translations';
+
+  const bay = document.querySelector<HTMLElement>('[data-bay]');
+  const stage = document.querySelector<HTMLElement>('[data-bay-stage]');
+  const rail = document.querySelector<HTMLElement>('[data-bay-rail]');
+  const glow = document.querySelector<HTMLElement>('[data-bay-glow]');
+  const line = document.querySelector<SVGPathElement>('[data-bay-line]');
+  const title = document.querySelector<HTMLElement>('[data-bay-title]');
+  const closing = document.querySelector<HTMLElement>('[data-bay-closing]');
+  const list = document.querySelector<HTMLElement>('[data-bay-sectors]');
+  const lights = Array.from(document.querySelectorAll<HTMLElement>('[data-bay-light]'));
+
+  // Sector list follows the language switch (it is split from one string).
+  function renderSectors(lang: Language) {
+    if (!list) return;
+    const items = translations[lang].city.sectors.split(' · ');
+    const lis = list.querySelectorAll('li');
+    items.forEach((s, i) => lis[i] && (lis[i].textContent = s));
+    list.setAttribute('aria-label', translations[lang].city.title);
+  }
+  window.addEventListener('qorsu:lang-change', ((e: CustomEvent<{ lang: Language }>) =>
+    renderSectors(e.detail.lang)) as EventListener);
+  renderSectors((localStorage.getItem('qorsu_lang') as Language) || 'es');
+
+  if (bay && stage && rail) {
+    const sectorEls = () => Array.from(list?.querySelectorAll<HTMLElement>('li') ?? []);
+
+    if (reduceMotion) {
+      bay.classList.add('is-static');
+      lights.forEach((l) => l.classList.add('is-on'));
+      sectorEls().forEach((l) => l.classList.add('is-on'));
+    } else {
+      let top = 0;
+      let travel = 1;
+      let railW = 0;
+      let vw = 0;
+      let start = 0; // rail offset at p=0: open on the sun, not on empty water
+      let span = 1;
+      let igniteFrom = 0.5;
+
+      onMeasure(() => {
+        top = docTop(bay);
+        travel = Math.max(bay.offsetHeight - stage.offsetHeight, 1);
+        railW = rail.offsetWidth;
+        vw = stage.offsetWidth;
+        // Open with the sun (centre of the rail) a little right of centre.
+        start = clamp(0.5 * railW - 0.6 * vw, 0, Math.max(railW - vw, 0));
+        span = Math.max(railW - vw - start, 1);
+        // Start lighting when the first window (74% of the rail) is two thirds
+        // across the screen. Expressed in camera progress.
+        igniteFrom = clamp((0.74 * railW - vw * 0.66 - start) / span, 0.15, 0.75);
+      });
+
+      let lit = -1;
+      onFrame(({ y, vh }) => {
+        if (y < top - vh || y > top + travel + vh) return;
+        const p = clamp((y - top) / travel);
+
+        // Camera: ease in from rest, settle at the city, hold the last 8%.
+        const cam = range(p, 0, 0.92);
+        put(rail, 'transform', `translate3d(${(-(start + span * cam)).toFixed(1)}px,0,0)`);
+
+        // Title leaves as the city arrives; closing arrives with the full city.
+        const tOut = range(cam, igniteFrom - 0.2, igniteFrom - 0.06);
+        put(title, 'opacity', (1 - tOut).toFixed(3));
+        put(title, 'transform', `translate3d(0,${(-tOut * 24).toFixed(1)}px,0)`);
+        const cIn = range(p, 0.86, 0.95);
+        put(closing, 'opacity', cIn.toFixed(3));
+        put(closing, 'transform', `translate3d(0,${((1 - cIn) * 24).toFixed(1)}px,0)`);
+
+        const lIn = range(cam, igniteFrom - 0.08, igniteFrom);
+        put(list, 'opacity', lIn.toFixed(3));
+        put(list, 'transform', `translate3d(0,${((1 - lIn) * 20).toFixed(1)}px,0)`);
+
+        // Ignition: integer count of sectors switched on.
+        const q = clamp((cam - igniteFrom) / (0.97 - igniteFrom));
+        const n = Math.round(q * lights.length);
+        if (n !== lit) {
+          lit = n;
+          const items = sectorEls();
+          lights.forEach((l, i) => l.classList.toggle('is-on', i < n));
+          items.forEach((l, i) => l.classList.toggle('is-on', i < n));
+        }
+        put(glow, 'opacity', (q * 0.9).toFixed(3));
+        if (line) put(line as unknown as HTMLElement, 'strokeDashoffset', (1 - range(p, 0.88, 0.98)).toFixed(4));
+      });
+    }
+  }
+</script>

@@ -1,133 +1,213 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Tenor+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Tenor+Sans&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-serif: "Cormorant Garamond", serif;
   --font-sans: "Tenor Sans", sans-serif;
 
-  --color-forest-950: #1C2725;
-  --color-forest-900: #263633;
-  --color-forest-800: #2B3E3A;
-  --color-forest-700: #324744;
-  --color-forest-600: #3A4F4B;
-  --color-forest-500: #4A625D;
+  /* Deep teal greens, taken from the Qorsu panels */
+  --color-deep-950: #032724;
+  --color-deep-900: #07332D;
+  --color-deep-800: #0C3A32;
+  --color-deep-700: #18402F;
+  --color-deep-600: #194E3B;
+  --color-deep-500: #2A5C46;
 
-  --color-gold-600: #A8863A;
+  /* Gold of the sun */
+  --color-gold-600: #AF8422;
   --color-gold-500: #C9A24B;
-  --color-gold-400: #EBD5A0;
-  --color-gold-300: #E6CC8F;
+  --color-gold-400: #E3C878;
+  --color-gold-300: #EBD9A8;
   --color-gold-200: #F4EAD3;
 
-  --color-sage-500: #9FB5AC;
-  --color-sage-400: #CBD8D1;
-  --color-sage-300: #D8E2DC;
-  --color-sage-200: #E8EEE9;
+  /* Soft light text on teal (tinted, never flat grey) */
+  --color-mist-500: #A9C4B6;
+  --color-mist-400: #C6D9CD;
+  --color-mist-300: #DCE9E0;
+  --color-mist-200: #EDF4EE;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes qorsuWordGlow {
-  0%, 100% {
-    text-shadow: 0 0 0px rgba(235, 213, 160, 0);
-  }
-  50% {
-    text-shadow: 0 0 26px rgba(235, 213, 160, 0.55), 0 0 60px rgba(201, 162, 75, 0.3);
-  }
+:root {
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+  --section: clamp(5rem, 12vw, 10rem);
+  --hairline: rgba(201, 162, 75, 0.28);
 }
 
-@keyframes qorsuPlusPulse {
-  0%, 100% {
-    opacity: 0.5;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.25);
-  }
-}
-
-@keyframes floatSlow {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-8px) rotate(2deg);
-  }
-}
-
-@keyframes starSpinSlow {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Utilitarias personalizadas de lujo */
-@layer utilities {
-  .gold-gradient-text {
-    background: linear-gradient(180deg, #EBD5A0 0%, #C9A24B 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .gold-gradient-border {
-    border: 1px solid rgba(201, 162, 75, 0.25);
-  }
-
-  .gold-gradient-border-hover:hover {
-    border-color: rgba(235, 213, 160, 0.65);
-    box-shadow: 0 8px 30px rgba(201, 162, 75, 0.15);
-  }
-
-  .glass-card {
-    background: linear-gradient(180deg, rgba(58, 79, 75, 0.65) 0%, rgba(38, 54, 51, 0.45) 100%);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-  }
-
-  .animate-word-glow {
-    animation: qorsuWordGlow 6s ease-in-out infinite;
-  }
-
-  .animate-plus-pulse {
-    animation: qorsuPlusPulse 6s ease-in-out infinite;
-  }
-
-  .animate-float-slow {
-    animation: floatSlow 8s ease-in-out infinite;
-  }
-}
-
-/* Scroll smooth global y ajustes */
+/* ---- Base ---------------------------------------------------------------- */
 html {
-  scroll-behavior: smooth;
-  background-color: #263633;
-  color: #D8E2DC;
+  background-color: var(--color-deep-950);
+  color: var(--color-mist-300);
   font-family: var(--font-serif);
+  -webkit-text-size-adjust: 100%;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
 
 body {
   margin: 0;
-  padding: 0;
-  overflow-x: hidden;
+  overflow-x: clip; /* clip (not hidden) keeps position:sticky working */
   min-height: 100vh;
+  text-rendering: optimizeLegibility;
 }
 
-/* Scrollbar estilizada */
+h1, h2, h3 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+
+:focus-visible {
+  outline: 1px solid var(--color-gold-400);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: rgba(201, 162, 75, 0.35);
+  color: var(--color-gold-200);
+}
+
+/* Fine grain over the whole page: ties the illustrated art and flat grounds
+   into one printed surface. Static, so it costs nothing per frame. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---- Utilities ----------------------------------------------------------- */
+@layer utilities {
+  .text-gold {
+    color: var(--color-gold-400);
+  }
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  .measure {
+    max-width: 62ch;
+  }
+  .gutter {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+}
+
+/* ---- Hero entrance (transform + opacity only) --------------------------- */
+@keyframes heroRise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.35em, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes heroFade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes sunSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hero-letter {
+  display: inline-block;
+  opacity: 0;
+  animation: heroRise 1.5s var(--ease-out-expo) forwards;
+  animation-delay: var(--d, 0ms);
+}
+.hero-fade {
+  opacity: 0;
+  animation: heroFade 1.4s var(--ease-out-expo) forwards;
+  animation-delay: var(--d, 0ms);
+}
+
+/* Held until the intro opens */
+html.intro-active:not(.intro-done) .hero-letter,
+html.intro-active:not(.intro-done) .hero-fade {
+  animation-play-state: paused;
+}
+html.scroll-locked {
+  overflow: hidden;
+}
+
+/* ---- Flow reveals: fire once, transform + opacity only ------------------ */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 1s var(--ease-out-expo),
+    transform 1.2s var(--ease-out-expo);
+  transition-delay: var(--rd, 0ms);
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---- Gold marquee ------------------------------------------------------- */
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.marquee-track {
+  animation: marquee 60s linear infinite;
+}
+
+/* ---- Reduced motion: fewer and gentler, nothing hidden ------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .hero-letter,
+  .hero-fade,
+  .reveal {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
+  }
+  .marquee-track {
+    animation: none;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #263633;
+  background: var(--color-deep-950);
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #3A4F4B;
+  background: var(--color-deep-700);
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #C9A24B;
+  background: var(--color-gold-600);
 }

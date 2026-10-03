@@ -1,0 +1,140 @@
+---
+import { translations } from '../i18n/translations';
+const t = translations.es;
+---
+
+<!--
+  The close. The jet over the lit coast, one sentence, one raised button.
+  It holds, then hands straight into the footer on the same ground.
+-->
+<section id="contacto" class="contact relative" data-contact aria-labelledby="contact-title">
+  <div class="contact-art" data-contact-art aria-hidden="true">
+    <img src="/art/jet-coast.webp" alt="" loading="lazy" decoding="async" />
+  </div>
+  <div class="contact-scrim" aria-hidden="true"></div>
+
+  <div class="contact-copy gutter">
+    <h2 id="contact-title" data-i18n="contact.title" class="contact-title reveal">{t.contact.title}</h2>
+    <a href="mailto:hola@qorsu.com" class="contact-cta reveal" style="--rd:160ms">
+      <span data-i18n="contact.email">{t.contact.email}</span>
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </a>
+  </div>
+</section>
+
+<style>
+  .contact {
+    min-height: 78svh;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--color-deep-950);
+  }
+  .contact-art {
+    position: absolute;
+    inset: -12% 0;
+    will-change: transform;
+  }
+  .contact-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 62%;
+  }
+  .contact-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, var(--color-deep-950) 0%, rgba(3, 39, 36, 0.2) 30%, rgba(3, 39, 36, 0.3) 70%, var(--color-deep-950) 100%);
+  }
+  .contact-copy {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 80rem;
+    margin: 0 auto;
+    padding-top: clamp(9rem, 26vh, 14rem);
+    padding-bottom: clamp(3.5rem, 8vh, 5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: clamp(2.25rem, 6vh, 3.5rem);
+  }
+  .contact-title {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(3.75rem, 12vw, 10rem);
+    line-height: 0.95;
+    letter-spacing: -0.015em;
+    color: var(--color-gold-300);
+    text-shadow: 0 6px 40px rgba(3, 39, 36, 0.55);
+    margin: 0;
+  }
+
+  /* The raised pill: lit from above, casting down onto the scene */
+  .contact-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.1rem;
+    padding: 1.15rem 2.4rem 1.15rem 2.6rem;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 1.6vw, 1.3rem);
+    letter-spacing: 0.08em;
+    color: #10231f;
+    background: linear-gradient(180deg, #f3e6c2 0%, #e8d29d 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -2px 0 rgba(150, 110, 40, 0.18),
+      0 2px 4px rgba(0, 0, 0, 0.2),
+      0 18px 40px -10px rgba(0, 0, 0, 0.6),
+      0 30px 80px -30px rgba(227, 200, 120, 0.45);
+    transition:
+      transform 0.5s var(--ease-out-expo),
+      box-shadow 0.5s var(--ease-out-expo),
+      opacity 1s var(--ease-out-expo);
+  }
+  .contact-cta svg {
+    transition: transform 0.5s var(--ease-out-expo);
+  }
+  .contact-cta.revealed:hover {
+    transform: translate3d(0, -3px, 0);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -2px 0 rgba(150, 110, 40, 0.18),
+      0 4px 8px rgba(0, 0, 0, 0.2),
+      0 26px 50px -12px rgba(0, 0, 0, 0.65),
+      0 30px 90px -24px rgba(227, 200, 120, 0.6);
+  }
+  .contact-cta:hover svg {
+    transform: translate3d(4px, 0, 0);
+  }
+  .contact-cta:active {
+    transform: translate3d(0, 0, 0) scale(0.98);
+  }
+</style>
+
+<script>
+  import { onFrame, onMeasure, reduceMotion, docTop, put } from '../scripts/motion';
+
+  const sec = document.querySelector<HTMLElement>('[data-contact]');
+  const art = document.querySelector<HTMLElement>('[data-contact-art]');
+  if (sec && art && !reduceMotion) {
+    let top = 0;
+    let h = 1;
+    onMeasure(() => {
+      top = docTop(sec);
+      h = sec.offsetHeight;
+    });
+    onFrame(({ y, vh }) => {
+      if (y + vh < top || y > top + h) return;
+      const p = (y + vh - top) / (h + vh); // 0 entering .. 1 leaving
+      put(art, 'transform', `translate3d(0,${((0.5 - p) * 16).toFixed(2)}%,0)`);
+    });
+  }
+</script>

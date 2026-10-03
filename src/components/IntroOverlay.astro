@@ -1,0 +1,258 @@
+---
+/**
+ * Opening title card. The sun mark turns a full circle as it arrives, the
+ * letters gather around it into QORSU, then the page is revealed through a
+ * widening opening centred on the sun. Once per session; skipped entirely
+ * under prefers-reduced-motion (the inline script in Layout decides before
+ * first paint, so there is no flash either way).
+ */
+---
+
+<div class="intro" data-intro aria-hidden="true">
+  <div class="intro-mark">
+    <span class="intro-side intro-side--l">
+      <span class="intro-l" style="--i:0">Q</span>
+    </span>
+    <span class="intro-o">
+      <span class="intro-glow"></span>
+      <img src="/logo.png" alt="" class="intro-sun" />
+    </span>
+    <span class="intro-side intro-side--r">
+      <span class="intro-l" style="--i:1">R</span>
+      <span class="intro-l" style="--i:2">S</span>
+      <span class="intro-l" style="--i:3">U</span>
+    </span>
+  </div>
+  <button type="button" class="intro-skip" data-intro-skip data-i18n="intro.skip">Saltar intro</button>
+</div>
+
+<style>
+  @property --hole {
+    syntax: '<length-percentage>';
+    inherits: false;
+    initial-value: 0%;
+  }
+
+  .intro {
+    display: none;
+  }
+  :global(html.intro-active) .intro {
+    display: grid;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    place-items: center;
+    background:
+      radial-gradient(70% 60% at 50% 50%, #26302c 0%, #1b2422 60%, #141b1a 100%);
+    /* The reveal: a transparent disc that grows from the sun */
+    -webkit-mask: radial-gradient(circle at var(--sx, 50%) var(--sy, 50%), transparent var(--hole), #000 calc(var(--hole) + 1px));
+    mask: radial-gradient(circle at var(--sx, 50%) var(--sy, 50%), transparent var(--hole), #000 calc(var(--hole) + 1px));
+  }
+  :global(html.intro-active) .intro.is-revealing {
+    animation: introHole 1.25s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+    pointer-events: none;
+  }
+  :global(html.intro-active) .intro.is-revealing .intro-mark {
+    translate: var(--shift) 0;
+    animation: introLift 1.25s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+  }
+
+  /* The O sits dead centre; the letters hang off either side of it, so the
+     sun can arrive alone in the middle and the word can gather around it. */
+  .intro-mark {
+    --shift: -1.02em; /* (right side - left side) / 2: recentres QORSU */
+    position: relative;
+    display: block;
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: clamp(3.4rem, 15vw, 9.5rem);
+    line-height: 1;
+    color: var(--color-gold-400);
+    user-select: none;
+    animation: introShift 1.5s cubic-bezier(0.65, 0, 0.35, 1) 1.35s both;
+  }
+  .intro-side {
+    position: absolute;
+    top: 50%;
+    display: flex;
+    transform: translateY(-50%);
+    white-space: nowrap;
+  }
+  .intro-side--l {
+    right: 100%;
+  }
+  .intro-side--r {
+    left: 100%;
+  }
+  .intro-l {
+    display: inline-block;
+    margin: 0 0.24em;
+    opacity: 0;
+    transform: translate3d(0, 0.3em, 0);
+    animation: introLetter 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(1.55s + var(--i) * 0.12s);
+  }
+  .intro-o {
+    position: relative;
+    display: block;
+    width: 1.12em;
+    height: 1.12em;
+    margin: 0 0.1em;
+    animation: introSettle 1.5s cubic-bezier(0.65, 0, 0.35, 1) 1.35s both;
+  }
+  .intro-glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 5.5em;
+    height: 5.5em;
+    margin: -2.75em 0 0 -2.75em;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255, 205, 100, 0.4), rgba(201, 162, 75, 0.12) 45%, transparent 100%);
+    opacity: 0;
+    transform: scale(0.3);
+    animation: introGlow 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+    pointer-events: none;
+  }
+  .intro-sun {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    animation: introSun 1.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .intro-skip {
+    position: absolute;
+    right: var(--gutter);
+    bottom: clamp(1.25rem, 4vh, 2rem);
+    padding: 0.75rem 0.25rem;
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(198, 217, 205, 0.7);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    opacity: 0;
+    animation: introLetter 0.8s ease 0.6s forwards;
+    transition: color 0.3s;
+  }
+  .intro-skip:hover {
+    color: var(--color-gold-300);
+  }
+
+  @keyframes introSun {
+    0% {
+      opacity: 0;
+      transform: scale(0.4) rotate(-360deg);
+    }
+    30% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+  }
+  /* The sun arrives large and alone, then settles to letter size */
+  @keyframes introSettle {
+    from {
+      transform: scale(1.7);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  @keyframes introShift {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(var(--shift), 0, 0);
+    }
+  }
+  @keyframes introGlow {
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes introLetter {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes introHole {
+    from {
+      --hole: 0%;
+    }
+    to {
+      --hole: 150%;
+    }
+  }
+  @keyframes introLift {
+    to {
+      transform: scale(1.18);
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .intro-mark {
+      --shift: -0.86em;
+    }
+    .intro-l {
+      margin: 0 0.16em;
+    }
+    .intro-skip {
+      left: 0;
+      right: 0;
+      text-align: center;
+    }
+  }
+</style>
+
+<script>
+  import { lockScroll } from '../scripts/motion';
+
+  const root = document.documentElement;
+  const intro = document.querySelector<HTMLElement>('[data-intro]');
+
+  if (intro && root.classList.contains('intro-active')) {
+    lockScroll(true);
+    window.scrollTo(0, 0);
+
+    let done = false;
+    const finish = () => {
+      root.classList.remove('intro-active');
+      root.classList.add('intro-done');
+      lockScroll(false);
+      try {
+        sessionStorage.setItem('qorsu_intro', '1');
+      } catch {}
+    };
+    const reveal = () => {
+      if (done) return;
+      done = true;
+      // Open the hole exactly where the sun sits
+      const sun = intro.querySelector<HTMLElement>('.intro-sun')!.getBoundingClientRect();
+      intro.style.setProperty('--sx', `${sun.left + sun.width / 2}px`);
+      intro.style.setProperty('--sy', `${sun.top + sun.height / 2}px`);
+      intro.classList.add('is-revealing');
+      // Let the hero entrance start as the opening widens
+      root.classList.add('intro-done');
+      window.setTimeout(finish, 1300);
+    };
+
+    const timer = window.setTimeout(reveal, 3500);
+    intro.querySelector('[data-intro-skip]')?.addEventListener('click', () => {
+      clearTimeout(timer);
+      reveal();
+    });
+  }
+</script>

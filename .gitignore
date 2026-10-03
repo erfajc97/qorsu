@@ -22,3 +22,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# local working files (not part of the site)
+assets-source/
+.claude/
+scrollcraft/

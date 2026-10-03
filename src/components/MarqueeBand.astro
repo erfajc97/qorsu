@@ -1,0 +1,45 @@
+---
+import { translations } from '../i18n/translations';
+const t = translations.es;
+// A slow gold marquee of everything Qorsu touches — keeps the page breathing
+const items = t.marquee.items;
+---
+
+<div class="relative overflow-hidden border-y border-gold-500/20 bg-deep-950 py-5 select-none" aria-hidden="true">
+  <div class="marquee-track flex w-max items-center gap-10 whitespace-nowrap">
+    {[...items, ...items].map((item) => (
+      <span class="flex items-center gap-10">
+        <span class="font-sans text-[11px] tracking-[0.35em] uppercase text-gold-300/80">{item}</span>
+        <span class="text-gold-500/60 text-[9px]">✦</span>
+      </span>
+    ))}
+  </div>
+  <div class="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-deep-950 to-transparent"></div>
+  <div class="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-deep-950 to-transparent"></div>
+</div>
+
+<script>
+  import { translations } from '../i18n/translations';
+
+  function renderMarquee(lang: 'es' | 'en') {
+    const track = document.querySelector<HTMLElement>('.marquee-track');
+    if (!track) return;
+    const items = translations[lang].marquee.items;
+    const doubled = [...items, ...items];
+    track.innerHTML = doubled
+      .map(
+        (item) =>
+          `<span class="flex items-center gap-10"><span class="font-sans text-[11px] tracking-[0.35em] uppercase text-gold-300/80">${item}</span><span class="text-gold-500/60 text-[9px]">✦</span></span>`
+      )
+      .join('');
+  }
+
+  window.addEventListener('qorsu:lang-change', ((e: CustomEvent<{ lang: 'es' | 'en' }>) => {
+    renderMarquee(e.detail.lang);
+  }) as EventListener);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const lang = (localStorage.getItem('qorsu_lang') as 'es' | 'en') || 'es';
+    renderMarquee(lang);
+  });
+</script>

@@ -1,99 +1,104 @@
 ---
-import { translations } from "../i18n/translations";
-const defaultLang = "es";
-const t = translations[defaultLang].footer;
+import { translations } from '../i18n/translations';
+const t = translations.es;
+
+// Fill these in to make the links live. Empty = rendered as plain text.
+const socials = {
+  instagram: '',
+  linkedin: '',
+};
 ---
 
-<footer
-  class="relative px-6 py-10 md:py-20 border-t border-gold-500/25 bg-forest-800 text-center overflow-hidden"
->
-  <div class="max-w-4xl mx-auto flex flex-col items-center gap-6 relative z-10">
-    <!-- Icono central Qorsu -->
-    <div class="group relative inline-block w-25 h-25" aria-label="Qorsu Top">
-      <img
-        src="/logo.png"
-        alt="Qorsu Top"
-        class="w-full h-full object-contain"
-      />
-    </div>
+<footer class="footer gutter">
+  <img src="/logo.png" alt="QORSU" class="footer-sun" width="40" height="40" />
 
-    <!-- Enlaces Sociales -->
-    <nav
-      id="footer-links"
-      class="flex flex-wrap items-center justify-center gap-8 font-sans text-xs tracking-[0.25em] uppercase"
-    >
-      {
-        t.socialLinks.map((link, i) => (
-          <a
-            href={link.href}
-            class="footer-link text-gold-500 hover:text-gold-300 transition-colors duration-300 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-gold-300 hover:after:w-full after:transition-all after:duration-300"
-            data-link-idx={i}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {link.label}
-          </a>
-        ))
-      }
-    </nav>
+  <nav class="footer-links" aria-label="Qorsu">
+    <a href={socials.instagram || undefined} target="_blank" rel="noopener">Instagram</a>
+    <a href={socials.linkedin || undefined} target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:hola@qorsu.com" data-i18n="footer.contact">{t.footer.contact}</a>
+  </nav>
 
-    <!-- Línea divisoria sutil -->
-    <div class="w-24 h-px bg-gold-500/20 my-1"></div>
+  <span class="footer-rule" aria-hidden="true"></span>
 
-    <!-- Copyright (i18n) -->
-    <div
-      class="flex items-center gap-2 uppercase font-sans text-xs tracking-[0.25em]"
-    >
-      <div
-        id="footer-copyright"
-        class="uppercase text-sage-500 select-none transition-opacity duration-300"
-      >
-        {t.copyright}
-      </div>
-      <a
-        href={"https://shepwashi.com/"}
-        class="footer-link text-gold-500 hover:text-gold-300 transition-colors duration-300 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-gold-300 hover:after:w-full after:transition-all after:duration-300"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Shepwashi
-      </a>
-      · 2026
-    </div>
-  </div>
+  <p class="footer-line">
+    <span data-i18n="footer.before">{t.footer.before}</span>
+    <span class="footer-brand">Shepwashi</span>
+    <span data-i18n="footer.after">{t.footer.after}</span>
+    <span class="footer-year">· 2026</span>
+  </p>
 </footer>
 
-<script>
-  import { translations, type Language } from "../i18n/translations";
-
-  function updateFooterLang(lang: Language) {
-    const t = translations[lang].footer;
-    const copyrightEl = document.getElementById("footer-copyright");
-    if (copyrightEl) {
-      copyrightEl.textContent = t.copyright;
-    }
-
-    const links = document.querySelectorAll<HTMLAnchorElement>(".footer-link");
-    links.forEach((linkEl) => {
-      const idxStr = linkEl.getAttribute("data-link-idx");
-      if (idxStr === null) return;
-      const idx = parseInt(idxStr, 10);
-      const linkData = t.socialLinks[idx];
-      if (linkData) {
-        linkEl.textContent = linkData.label;
-        linkEl.href = linkData.href;
-      }
-    });
+<style>
+  .footer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding-top: 0;
+    padding-bottom: clamp(2.5rem, 7vh, 4rem);
+    background: var(--color-deep-950);
+    text-align: center;
+  }
+  .footer-sun {
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: contain;
+  }
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem clamp(1.5rem, 4vw, 3rem);
+  }
+  .footer-links a {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-gold-500);
+    padding: 0.5rem 0;
+    transition: color 0.3s;
+  }
+  .footer-links a[href]:hover {
+    color: var(--color-gold-300);
+  }
+  .footer-rule {
+    width: 6rem;
+    height: 1px;
+    background: var(--hairline);
+  }
+  .footer-line {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0 0.55em;
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-mist-500);
+  }
+  .footer-line span:empty {
+    display: none;
+  }
+  .footer-brand {
+    color: var(--color-gold-500);
+  }
+  .footer-year {
+    color: var(--color-mist-300);
+    white-space: nowrap;
   }
 
-  window.addEventListener("qorsu:lang-change", ((
-    e: CustomEvent<{ lang: Language }>,
-  ) => {
-    updateFooterLang(e.detail.lang);
-  }) as EventListener);
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const lang = (localStorage.getItem("qorsu_lang") as Language) || "es";
-    updateFooterLang(lang);
-  });
-</script>
+  @media (max-width: 767px) {
+    .footer-links a {
+      font-size: 0.72rem;
+      letter-spacing: 0.26em;
+    }
+    .footer-line {
+      font-size: 0.66rem;
+      letter-spacing: 0.24em;
+    }
+  }
+</style>

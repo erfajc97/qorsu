@@ -3,29 +3,30 @@ import Logo from './Logo.astro';
 ---
 
 <header
-  class="fixed top-0 z-50 w-full transition-all duration-300 backdrop-blur-md bg-forest-800 border-b border-gold-500/10"
+  id="site-header"
+  class="site-header fixed top-0 z-50 w-full"
 >
-  <div class="max-w-7xl mx-auto flex items-center justify-between px-3 py-3 sm:py-5 md:px-12">
-    <Logo size="responsive" />
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-5 py-4 sm:px-10 sm:py-6">
+    <a href="#top" aria-label="Qorsu">
+      <Logo size="responsive" />
+    </a>
 
     <div
-      class="flex items-center gap-1 p-1 rounded-full border border-gold-500/20 bg-forest-900/60 shadow-inner"
+      class="flex items-center gap-1 p-1 rounded-full border border-white/15 bg-deep-950/45 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.45)]"
       role="group"
       aria-label="Language Switcher"
     >
       <button
         type="button"
-        id="lang-btn-es"
         data-lang="es"
-        class="lang-toggle-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-sans text-xs tracking-[0.2em] transition-all duration-300 cursor-pointer bg-gold-500/20 text-gold-300 border border-gold-500/30 shadow-[0_0_12px_rgba(201,162,75,0.25)]"
+        class="lang-toggle-btn min-h-9 px-3.5 sm:px-4 py-1.5 rounded-full font-sans text-xs tracking-[0.2em] transition-colors duration-300 cursor-pointer"
       >
         ES
       </button>
       <button
         type="button"
-        id="lang-btn-en"
         data-lang="en"
-        class="lang-toggle-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-sans text-xs tracking-[0.2em] transition-all duration-300 cursor-pointer text-sage-500 border border-transparent hover:text-sage-300"
+        class="lang-toggle-btn min-h-9 px-3.5 sm:px-4 py-1.5 rounded-full font-sans text-xs tracking-[0.2em] transition-colors duration-300 cursor-pointer"
       >
         EN
       </button>
@@ -33,32 +34,40 @@ import Logo from './Logo.astro';
   </div>
 </header>
 
+<style>
+  .lang-active {
+    background: rgba(201, 162, 75, 0.22);
+    color: #EBD9A8;
+    border: 1px solid rgba(201, 162, 75, 0.35);
+    box-shadow: 0 0 14px rgba(201, 162, 75, 0.25);
+  }
+  .lang-idle {
+    color: rgba(169, 196, 182, 0.75);
+    border: 1px solid transparent;
+  }
+  .lang-idle:hover {
+    color: #EDF4EE;
+  }
+  /* No bar: just the mark and the language pill floating over the page */
+  .site-header {
+    pointer-events: none;
+  }
+  .site-header :global(a),
+  .site-header [role='group'] {
+    pointer-events: auto;
+  }
+  .site-header :global(a) {
+    filter: drop-shadow(0 1px 6px rgba(3, 39, 36, 0.6));
+  }
+</style>
+
 <script>
   function updateLangUI(lang: 'es' | 'en') {
-    const btnEs = document.getElementById('lang-btn-es');
-    const btnEn = document.getElementById('lang-btn-en');
-    if (!btnEs || !btnEn) return;
-
-    const activeClass = [
-      'bg-gold-500/20',
-      'text-gold-300',
-      'border',
-      'border-gold-500/30',
-      'shadow-[0_0_12px_rgba(201,162,75,0.25)]',
-    ];
-    const idleClass = ['text-sage-500', 'border', 'border-transparent', 'hover:text-sage-300'];
-
-    if (lang === 'es') {
-      btnEs.classList.remove(...idleClass);
-      btnEs.classList.add(...activeClass);
-      btnEn.classList.remove(...activeClass);
-      btnEn.classList.add(...idleClass);
-    } else {
-      btnEn.classList.remove(...idleClass);
-      btnEn.classList.add(...activeClass);
-      btnEs.classList.remove(...activeClass);
-      btnEs.classList.add(...idleClass);
-    }
+    document.querySelectorAll<HTMLButtonElement>('.lang-toggle-btn').forEach((btn) => {
+      const isActive = btn.getAttribute('data-lang') === lang;
+      btn.classList.toggle('lang-active', isActive);
+      btn.classList.toggle('lang-idle', !isActive);
+    });
   }
 
   function setupNavbar() {
@@ -77,11 +86,10 @@ import Logo from './Logo.astro';
         );
       });
     });
+
   }
 
-  // Ejecutar al cargar la página y en transiciones de vista de Astro
-  document.addEventListener('DOMContentLoaded', setupNavbar);
-  document.addEventListener('astro:page-load', setupNavbar);
+  setupNavbar();
 
   window.addEventListener('qorsu:lang-change', ((e: CustomEvent<{ lang: 'es' | 'en' }>) => {
     updateLangUI(e.detail.lang);
